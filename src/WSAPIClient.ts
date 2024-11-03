@@ -5,12 +5,17 @@ export class WSAPIClient {
   private readonly liveId: string;
   private pingerId: number | null = null;
   private websocketClient: Websocket | null = null;
+  private reconnectCounter = 0;
 
   constructor(liveId: string, private readonly platformAPI: PlatformAPI) {
     this.liveId = liveId.replace(/^lv/, "");
   }
 
   public async connect() {
+    this.reconnectCounter++;
+    if (this.reconnectCounter > 10) {
+      throw new Error("[WSAPIClient] reconnect failed");
+    }
     if (this.websocketClient !== null) {
       this.disconnect();
     }
@@ -39,13 +44,15 @@ export class WSAPIClient {
                 chasePlay: false,
               },
               room: { protocol: "webSocket", commentable: false },
-              reconnect: true,
+              reconnect: false,
             },
           })
         );
       })
       .on("close", () => {
-        throw new Error("[WSAPIClient] disconnected");
+        setTimeout(() => {
+          this.connect();
+        }, 3000);
       })
       .on("message", this.onRawMessage);
 
