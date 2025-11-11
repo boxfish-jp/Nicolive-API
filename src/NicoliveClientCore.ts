@@ -8,12 +8,14 @@ export interface NicoliveClientConfig {
 	/**
 	 *  配信ID(`"lvXXXXXXXX"`)
 	 */
-	liveId: string;
+	liveId?: string;
+	userId?: string;
 }
 
 export namespace NicoliveClientConfig {
 	export const Default: Required<NicoliveClientConfig> = {
 		liveId: "",
+		userId: "",
 	};
 }
 
@@ -71,7 +73,11 @@ export class NicoliveClientCore extends EventEmitter<EventMap> {
 	connect() {
 		this.disconnect();
 
-		const wsApiClient = new WSAPIClient(this.config.liveId, this.platformAPI);
+		const wsApiClient = new WSAPIClient(
+			this.config.liveId,
+			this.config.userId,
+			this.platformAPI,
+		);
 		wsApiClient.onMessageServerMessage = (message) => {
 			this.setMessageServerUri(message.data.viewUri);
 		};

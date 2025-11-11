@@ -3,15 +3,18 @@ import type { PlatformAPI } from "./platform/PlatformAPI";
 
 export class WSAPIClient {
 	private readonly liveId: string;
+	private readonly userId: string;
 	private pingerId: number | null = null;
 	private websocketClient: Websocket | null = null;
 	private reconnectCounter = 0;
 
 	constructor(
 		liveId: string,
+		userId: string,
 		private readonly platformAPI: PlatformAPI,
 	) {
 		this.liveId = liveId.replace(/^lv/, "");
+		this.userId = userId;
 	}
 
 	public async connect() {
@@ -22,10 +25,14 @@ export class WSAPIClient {
 		if (this.websocketClient !== null) {
 			this.disconnect();
 		}
+		if (!this.liveId && !this.userId) {
+			throw new Error("liveId or userId must be specified");
+		}
 
-		const liveHTML = await (
-			await fetch(`https://live.nicovideo.jp/watch/lv${this.liveId}`)
-		).text();
+		const url = this.liveId
+			? `https://live.nicovideo.jp/watch/lv${this.liveId}`
+			: `https://live.nicovideo.jp/watch/user/${this.userId}`;
+		const liveHTML = await (await fetch(url)).text();
 		const websocketURL =
 			await this.platformAPI.extractWSAPIURLFromHTML(liveHTML);
 
