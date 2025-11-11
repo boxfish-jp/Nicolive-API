@@ -26,6 +26,10 @@ type EventMap = {
 		message: proto.SimpleNotification,
 		meta?: proto.ChunkedMessage_Meta,
 	];
+	simpleNotificationV2: [
+		message: proto.SimpleNotificationV2,
+		meta?: proto.ChunkedMessage_Meta,
+	];
 	gift: [message: proto.Gift, meta?: proto.ChunkedMessage_Meta];
 	nicoad: [message: proto.Nicoad, meta?: proto.ChunkedMessage_Meta];
 	gameUpdate: [message: proto.GameUpdate, meta?: proto.ChunkedMessage_Meta];
@@ -134,6 +138,10 @@ export class NicoliveClientCore extends EventEmitter<EventMap> {
 
 			case "simpleNotification":
 				this.emit("simpleNotification", message.data.value, meta);
+				break;
+
+			case "simpleNotificationV2":
+				this.emit("simpleNotificationV2", message.data.value, meta);
 				break;
 
 			case "gift":
