@@ -36,9 +36,9 @@ jobs:
 
       - name: Create tar.gz archive
         run: |
-          tar -czvf nicolive-api-${{ github.ref_name }}.tar.gz build
+          tar -czvf nicolive-api.tar.gz build
 
       - name: Create GitHub Release and Upload Asset
         uses: softprops/action-gh-release@v1
         with:
-          files: nicolive-api-${{ github.ref_name }}.tar.gz
+          files: nicolive-api.tar.gz
