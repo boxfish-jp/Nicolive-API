@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@bufbuild/protobuf':
-        specifier: ^2.0.0
+        specifier: ^2.10.0
         version: 2.10.0
       cheerio:
         specifier: ^1.0.0-rc.12
@@ -22,10 +22,10 @@ importers:
         specifier: ^1.8.3
         version: 1.9.4
       '@bufbuild/buf':
-        specifier: ^1.35.1
+        specifier: ^1.59.0
         version: 1.59.0
       '@bufbuild/protoc-gen-es':
-        specifier: ^2.0.0
+        specifier: ^2.10.0
         version: 2.10.0(@bufbuild/protobuf@2.10.0)
       '@types/cheerio':
         specifier: ^0.22.35
