@@ -70,7 +70,7 @@ export class NicoliveClientCore extends EventEmitter<EventMap> {
 	/**
 	 * 配信のWebSocketAPI及びコメントサーバーへ接続する
 	 */
-	connect() {
+	async connect() {
 		this.disconnect();
 
 		const wsApiClient = new WSAPIClient(
@@ -81,7 +81,7 @@ export class NicoliveClientCore extends EventEmitter<EventMap> {
 		wsApiClient.onMessageServerMessage = (message) => {
 			this.setMessageServerUri(message.data.viewUri);
 		};
-		wsApiClient.connect();
+		await wsApiClient.connect();
 		this.wsApiClient = wsApiClient;
 	}
 

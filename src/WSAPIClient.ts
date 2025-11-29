@@ -7,7 +7,6 @@ export class WSAPIClient {
 	private pingerId: number | null = null;
 	private websocketClient: Websocket | null = null;
 	private reconnectCounter = 0;
-
 	constructor(
 		liveId: string,
 		userId: string,
@@ -36,12 +35,28 @@ export class WSAPIClient {
 		const websocketURL =
 			await this.platformAPI.extractWSAPIURLFromHTML(liveHTML);
 
-		const websocketClient = this.platformAPI
-			.createWebsocket(websocketURL)
-			.on("error", (err) => {
-				throw err;
-			})
-			.on("open", () => {
+		const websocketClient = this.platformAPI.createWebsocket(websocketURL);
+
+		let opened = false;
+		// attach message and close handlers early
+		websocketClient.on("message", this.onRawMessage);
+		websocketClient.on("close", () => {
+			setTimeout(() => {
+				this.connect();
+			}, 3000);
+		});
+
+		await new Promise<void>((resolve, reject) => {
+			websocketClient.on("error", (err) => {
+				if (!opened) {
+					console.error("[WSAPIClient] websocket error:", err);
+					reject(err);
+					return;
+				}
+			});
+
+			websocketClient.on("open", () => {
+				opened = true;
 				websocketClient.send(
 					JSON.stringify({
 						type: "startWatching",
@@ -57,13 +72,9 @@ export class WSAPIClient {
 						},
 					}),
 				);
-			})
-			.on("close", () => {
-				setTimeout(() => {
-					this.connect();
-				}, 3000);
-			})
-			.on("message", this.onRawMessage);
+				resolve();
+			});
+		});
 
 		this.websocketClient = websocketClient;
 	}
