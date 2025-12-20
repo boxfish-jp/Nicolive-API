@@ -6,7 +6,6 @@ export class WSAPIClient {
 	private readonly userId: string;
 	private pingerId: number | null = null;
 	private websocketClient: Websocket | null = null;
-	private reconnectCounter = 0;
 	constructor(
 		liveId: string,
 		userId: string,
@@ -17,10 +16,6 @@ export class WSAPIClient {
 	}
 
 	public async connect() {
-		this.reconnectCounter++;
-		if (this.reconnectCounter > 10) {
-			throw new Error("[WSAPIClient] reconnect failed");
-		}
 		if (this.websocketClient !== null) {
 			this.disconnect();
 		}
@@ -40,11 +35,6 @@ export class WSAPIClient {
 		let opened = false;
 		// attach message and close handlers early
 		websocketClient.on("message", this.onRawMessage);
-		websocketClient.on("close", () => {
-			setTimeout(() => {
-				this.connect();
-			}, 3000);
-		});
 
 		await new Promise<void>((resolve, reject) => {
 			websocketClient.on("error", (err) => {
