@@ -86,13 +86,15 @@ export class MessageServerClient {
 	};
 
 	private onSegmentChunkedEntry = async (chunk: MessageSegment) => {
-		const response = await fetch(chunk.uri);
-		for await (const message of decodeChunkStream(
-			proto.ChunkedMessageSchema,
-			response.body as ReadableStream<Uint8Array>,
-		)) {
-			this.onChunkedMessage(message);
-		}
+		try {
+			const response = await fetch(chunk.uri);
+			for await (const message of decodeChunkStream(
+				proto.ChunkedMessageSchema,
+				response.body as ReadableStream<Uint8Array>,
+			)) {
+				this.onChunkedMessage(message);
+			}
+		} catch (ignored) {}
 	};
 
 	private onPreviousChunkedEntry = async (chunk: MessageSegment) => {
